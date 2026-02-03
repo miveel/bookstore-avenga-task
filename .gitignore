@@ -1,5 +1,42 @@
-# Ignore Gradle project-specific cache directory
-.gradle
+# ----------------------------
+# IntelliJ IDEA
+# ----------------------------
+.idea/
+*.iml
+*.iws
+out/
 
-# Ignore Gradle build output directory
-build
+# ----------------------------
+# Gradle
+# ----------------------------
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# ----------------------------
+# OS-specific
+# ----------------------------
+.DS_Store
+Thumbs.db
+
+# ----------------------------
+# Logs
+# ----------------------------
+*.log
+
+# ----------------------------
+# Allure results (optional: you may want to keep reports locally but not commit)
+# ----------------------------
+allure-results/
+allure-report/
+
+# ----------------------------
+# Temporary / local files
+# ----------------------------
+*.tmp
+*.swp
+
+# ----------------------------
+# Docker (optional: images and container metadata should not be committed)
+# ----------------------------
+docker-compose.override.yml
