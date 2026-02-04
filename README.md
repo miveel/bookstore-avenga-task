@@ -37,33 +37,26 @@ cd bookstore-api-automation
 ```bash
 export BASE_URL=https://fakerestapi.azurewebsites.net
 ```
-### 3. Build the project
-
+### 3. Build the project locally
+```bash
 ./gradlew clean build
+```
 
-### 4. Run all tests
+## Running tests 
+### Run all tests locally
+```bash
 ./gradlew test
-
-### 5. Generate Allure report
+```
+### Generate Allure report locally
+```bash
 ./gradlew allureReport
+```
 
-### 6. Serve Allure report locally
+### Serve Allure report locally
+```bash
 ./gradlew allureServe
-
-
-## Running Specific Tests
-
-You can run a single test class or even a specific test method using Gradle:
-
-### Run a single test class - POPRAVI
-```bash
-./gradlew test --tests BooksApiTests
 ```
-
-### Run a specific test method -POPRAVI
-```bash
-./gradlew test --tests BooksApiTests.testCreateBook
-```
+> Note: If using Docker (recommended), the container handles running tests and serving the report automatically.
 
 ## Docker Instructions
 
@@ -71,7 +64,7 @@ You can run a single test class or even a specific test method using Gradle:
 ```bash
 docker build -t bookstore-api-tests .
 ```
-### 2. Run tests and serve Allure report on host machine
+### 2. Run tests and serve Allure report automatically
 ```bash  
 docker run --rm \
   -p 8080:8080 \
@@ -79,10 +72,30 @@ docker run --rm \
   -v $(pwd)/allure-results:/app/build/allure-results \
   bookstore-api-tests
 ```
+
+* Test execution logs are printed in the console and saved to `/app/build/test-logs.txt` inside the container.
+* Allure report is automatically served and available at: [http://localhost:8080](http://localhost:8080)
+
 ### 3. View Allure report (Open your broser and navigate to)
 ```bash  
 http://localhost:8080/allureReport/index.html
 ```
+## Running specific tests
+
+### Run a single test class locally
+```bash 
+./gradlew test --tests BooksApiTests
+```
+### Run a specific test method locally
+```bash 
+./gradlew test --tests BooksApiTests.shouldCreateBookWithValidPayload
+```
+### Run a single test class inside Docker
+```bash 
+docker run --rm -e BASE_URL=https://fakerestapi.azurewebsites.net bookstore-api-tests \
+./gradlew test --tests BooksApiTests
+```
+
 ## Environment Variables
 
 - `BASE_URL` – base URL for the API (default: https://fakerestapi.azurewebsites.net)
@@ -91,33 +104,28 @@ http://localhost:8080/allureReport/index.html
 
 ## CI/CD with GitHub Actions
 
-- Workflow file: `.github/workflows/api-automation.yml`
-- The workflow is triggered on `push` or `pull_request` to the `main` branch.
+* Workflow file: `.github/workflows/api-automation.yml`
+* The workflow is triggered on `push` or `pull_request` to the `main` branch.
 
 ### Steps in the workflow
 
-1. **Checkout code**  
-   Pulls the repository code into the runner.
+1. **Checkout code** – Pull repository into runner.
+2. **Set up JDK 21** – Ensure Java 21 is available.
+3. **Cache Gradle dependencies** – Speed up builds.
+4. **Build project** – `./gradlew clean build -x test`.
+5. **Run tests and generate Allure report** – `./gradlew test allureReport`.
+6. **Upload Allure report as artifact** – For download or viewing in GitHub Actions.
 
-2. **Set up JDK 21**  
-   Ensures the runner uses Java 21 for building and running tests.
+> Note: The Docker container can also be used in CI/CD pipelines to run tests and serve reports consistently.
 
-3. **Cache Gradle dependencies**  
-   Speeds up subsequent builds by caching `.gradle` and Gradle wrapper files.
-
-4. **Build project**  
-   Runs `./gradlew clean build -x test` to compile the code.
-
-5. **Run tests and generate Allure report**  
-   Executes `./gradlew test allureReport` to run all API tests and generate reports.
-
-6. **Upload Allure report as artifact**  
-   Saves the Allure results so they can be downloaded or viewed later in GitHub Actions.
+---
 
 ## Notes / Best Practices
 
-- Follow clean code principles and SOLID design.
-- All tests are organized in `src/test/java` and reusable utilities are in `src/test/java/utils`.
-- Allure report provides visual summary of all API tests (pass/fail, steps, logs).
-- Docker ensures consistent test environment.
-- CI/CD workflow automatically runs tests on push/PR to main branch.
+* Follow clean code principles and SOLID design.
+* All tests are organized in `src/test/java` and reusable utilities are in `src/test/java/utils`.
+* Allure report provides visual summary of all API tests (pass/fail, steps, logs).
+* Docker ensures consistent test environment and automatic report generation.
+* Use descriptive test method names and comments for happy path vs edge/negative cases.
+
+---

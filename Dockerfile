@@ -1,27 +1,26 @@
-# Step 1: Use Eclipse Temurin JDK 21 as base image
+# -------------------- STEP 1: Base Image --------------------
+# Use Eclipse Temurin JDK 21 as base image
 FROM eclipse-temurin:21-jdk-jammy
 
-# Step 2: Set working directory inside the container
+# -------------------- STEP 2: Working Directory --------------------
 WORKDIR /app
 
-# Step 3: Copy Gradle wrapper and build files first (for dependency caching)
+# -------------------- STEP 3: Copy Gradle Wrapper and Build Files --------------------
+# Copy Gradle wrapper and build files first (for dependency caching)
 COPY gradlew gradlew
 COPY gradle gradle
 COPY build.gradle.kts settings.gradle.kts ./
 
-# Step 4: Copy the rest of the project source code
+# -------------------- STEP 4: Copy Source Code --------------------
 COPY src src
 
-# Step 5: Make Gradle wrapper executable
+# -------------------- STEP 5: Make Gradle Wrapper Executable --------------------
 RUN chmod +x ./gradlew
 
-# Step 6: Build project without running tests
+# -------------------- STEP 6: Build Project Without Running Tests --------------------
 RUN ./gradlew clean build -x test --no-daemon
 
-# Step 7: Run tests and generate Allure results
-RUN ./gradlew test allureReport --no-daemon
-
-# Step 8: Install Allure CLI to serve the report
+# -------------------- STEP 7: Install Allure CLI --------------------
 RUN apt-get update && \
     apt-get install -y wget unzip && \
     wget https://github.com/allure-framework/allure2/releases/download/2.22.0/allure-2.22.0.zip && \
@@ -29,9 +28,12 @@ RUN apt-get update && \
     ln -s /opt/allure-2.22.0/bin/allure /usr/bin/allure && \
     rm allure-2.22.0.zip
 
-# Step 9: Expose port 8080 for Allure server
+# -------------------- STEP 8: Expose Allure Report Port --------------------
 EXPOSE 8080
 
-# Step 10: Default command to serve Allure report mapped to host
-CMD ["allure", "open", "/app/build/reports/allure-report", "--host", "0.0.0.0", "--port", "8080"]
-
+# -------------------- STEP 9: Run Tests, Log Output, and Serve Allure Report --------------------
+# This command executes tests automatically on container start
+# Logs are saved to /app/build/test-logs.txt
+# Allure report is served on http://localhost:8080
+CMD ./gradlew clean test allureReport --no-daemon | tee /app/build/test-logs.txt && \
+    allure open /app/build/reports/allure-report --host 0.0.0.0 --port 8080
