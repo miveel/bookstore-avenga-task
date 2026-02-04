@@ -6,9 +6,10 @@ import tests.BaseApiTest;
 import utils.RequestBuilder;
 import utils.ResponseValidator;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-
+/**
+ * Tests for GET /Books/id endpoint.
+ * Includes happy path and edge cases.
+ */
 public class GetBookByIdTests extends BaseApiTest {
 
     // -------------------- HAPPY PATH --------------------
@@ -22,16 +23,17 @@ public class GetBookByIdTests extends BaseApiTest {
                 .get("/Books/" + bookId);
 
         ResponseValidator.assertStatusCode(response, 200);
-        ResponseValidator.assertMatchesSchema(response, "BookSchema.json");
 
-        assertThat(response.jsonPath().getInt("id"), equalTo(bookId));
+        ResponseValidator.assertMatchesSchema(response.asString(), "BookSchema.json");
+
+        ResponseValidator.assertJsonFieldEquals(response, "id", bookId);
     }
 
-    // -------------------- EDGE CASE --------------------
+    // -------------------- EDGE / NEGATIVE CASES --------------------
 
     @Test
     public void shouldReturn404WhenBookDoesNotExist() {
-        int nonExistingId = 999999;
+        int nonExistingId = 999999; // ID that does not exist
 
         Response response = RequestBuilder.baseRequest()
                 .when()

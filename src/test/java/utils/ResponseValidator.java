@@ -54,6 +54,17 @@ public class ResponseValidator {
     }
 
     /**
+     * Asserts that a list in the JSON response is not null.
+     *
+     * @param response the API response
+     * @param jsonPath the JSON path to the list
+     */
+    public static void assertListIsNotNull(Response response, String jsonPath) {
+        List<?> list = response.jsonPath().getList(jsonPath);
+        assertThat("List at path '" + jsonPath + "' should not be null", list, notNullValue());
+    }
+
+    /**
      * Validates a JSON string against a JSON schema file in src/test/resources/schemas/.
      *
      * @param json           JSON string to validate

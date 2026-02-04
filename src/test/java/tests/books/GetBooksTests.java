@@ -6,27 +6,49 @@ import tests.BaseApiTest;
 import utils.RequestBuilder;
 import utils.ResponseValidator;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-
+/**
+ * Tests for GET /Books endpoint.
+ * Includes happy path and accept type checks.
+ */
 public class GetBooksTests extends BaseApiTest {
 
     // -------------------- HAPPY PATH --------------------
 
     @Test
     public void shouldReturnAllBooks() {
-        // Send GET request to /Books endpoint
         Response response = RequestBuilder.baseRequest()
                 .when()
                 .get("/Books");
 
-        // Validate HTTP status code
         ResponseValidator.assertStatusCode(response, 200);
 
-        // Validate that at least 0 books are returned
-        assertThat(response.jsonPath().getList("$").size(), greaterThanOrEqualTo(0));
+        // Assert that the books list is not null, using ResponseValidator for consistency
+        ResponseValidator.assertListIsNotNull(response, "$");
+
+        // Validate each book in the response against the Book schema
+        ResponseValidator.assertBookListMatchesSchema(response);
     }
 
-    // -------------------- EDGE CASES --------------------
+    // -------------------- ACCEPT TYPE TESTS --------------------
+    @Test
+    public void shouldReturn200ForSupportedAcceptTypes() {
+        String[] acceptTypes = {
+                "application/json",
+                "text/json",
+                "text/plain" // API supports these;
+        };
 
+        for (String acceptType : acceptTypes) {
+            Response response = RequestBuilder.baseRequestWithAccept(acceptType)
+                    .when()
+                    .get("/Books");
+
+            ResponseValidator.assertStatusCode(response, 200);
+
+            // Only validate schema for JSON responses
+            if ("application/json".equals(acceptType) || "text/json".equals(acceptType)) {
+                ResponseValidator.assertBookListMatchesSchema(response);
+            }
+        }
+    }
 }
