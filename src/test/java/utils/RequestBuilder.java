@@ -12,13 +12,29 @@ import static io.restassured.RestAssured.given;
  */
 public class RequestBuilder {
 
+    private static final String DEFAULT_ACCEPT = "application/json";
+
     /**
      * Returns a base request specification with JSON content type.
      * Can be used for GET, DELETE, or requests without a body.
+     * No Accept header is set explicitly.
      */
+
     public static RequestSpecification baseRequest() {
         return given()
                 .contentType(ContentType.JSON);
+    }
+
+    /**
+     * Returns a base request specification with JSON content type.
+     * Accept header defaults to application/json if not specified.
+     *
+     * @param acceptType optional Accept type; if null, defaults to application/json
+     */
+    public static RequestSpecification baseRequestWithAccept(String acceptType) {
+        return given()
+                .contentType(ContentType.JSON)
+                .accept(acceptType != null ? acceptType : DEFAULT_ACCEPT);
     }
 
     /**
@@ -28,7 +44,7 @@ public class RequestBuilder {
      * @param book the Book object to be serialized to JSON
      */
     public static RequestSpecification bookRequest(Book book) {
-        return baseRequest()
+        return baseRequestWithAccept(DEFAULT_ACCEPT)
                 .body(book);
     }
 }

@@ -2,6 +2,10 @@ package config;
 
 import io.restassured.RestAssured;
 
+/**
+ * Global RestAssured configuration for API tests.
+ * Sets base URI, base path, and enables logging on validation failures.
+ */
 public class ApiTestConfig {
 
     public static void setup() {
