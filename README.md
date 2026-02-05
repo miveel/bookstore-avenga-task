@@ -31,7 +31,7 @@ bookstore-api-automation/
 ### 1. Clone the repository
 ```bash
 git clone <repo-url>
-cd bookstore-api-automation
+cd bookstore-api-automation  # local folder name, repo on GitHub is named bookstore-avenga-task
 ```
 ### 2. Set base URL (optional, default is FakeRestAPI)
 ```bash
@@ -56,44 +56,36 @@ export BASE_URL=https://fakerestapi.azurewebsites.net
 ```bash
 ./gradlew allureServe
 ```
-> Note: If using Docker (recommended), the container handles running tests and serving the report automatically.
 
 ## Docker Instructions
 
-### 1. Build Docker image
-```bash
+### Clean previous results (on host)
+```bash 
+rm -rf allure-results/* allure-report/*
+```
+### Build test image
+```bash 
 docker build -t bookstore-api-tests .
 ```
-### 2. Run tests and serve Allure report automatically
-```bash  
-docker run --rm \
-  -p 8080:8080 \
-  -e BASE_URL=https://fakerestapi.azurewebsites.net \
+### Run tests with mounted result folders
+```bash 
+docker run --rm -e BASE_URL=https://fakerestapi.azurewebsites.net \
   -v $(pwd)/allure-results:/app/build/allure-results \
+  -v $(pwd)/allure-report:/app/build/reports/allure-report \
   bookstore-api-tests
-```
 
-* Test execution logs are printed in the console and saved to `/app/build/test-logs.txt` inside the container.
-* Allure report is automatically served and available at: [http://localhost:8080](http://localhost:8080)
+```
+### Serve report
+```bash 
+docker run --rm -p 5050:5050 \
+  -v $(pwd)/allure-results:/app/allure-results \
+  -v $(pwd)/allure-report:/app/default-reports \
+  frankescobar/allure-docker-service
 
-### 3. View Allure report (Open your broser and navigate to)
-```bash  
-http://localhost:8080/allureReport/index.html
 ```
-## Running specific tests
-
-### Run a single test class locally
+### Open report
 ```bash 
-./gradlew test --tests BooksApiTests
-```
-### Run a specific test method locally
-```bash 
-./gradlew test --tests BooksApiTests.shouldCreateBookWithValidPayload
-```
-### Run a single test class inside Docker
-```bash 
-docker run --rm -e BASE_URL=https://fakerestapi.azurewebsites.net bookstore-api-tests \
-./gradlew test --tests BooksApiTests
+http://localhost:5050/allure-docker-service/latest-report
 ```
 
 ## Environment Variables
@@ -117,15 +109,4 @@ docker run --rm -e BASE_URL=https://fakerestapi.azurewebsites.net bookstore-api-
 6. **Upload Allure report as artifact** – For download or viewing in GitHub Actions.
 
 > Note: The Docker container can also be used in CI/CD pipelines to run tests and serve reports consistently.
-
----
-
-## Notes / Best Practices
-
-* Follow clean code principles and SOLID design.
-* All tests are organized in `src/test/java` and reusable utilities are in `src/test/java/utils`.
-* Allure report provides visual summary of all API tests (pass/fail, steps, logs).
-* Docker ensures consistent test environment and automatic report generation.
-* Use descriptive test method names and comments for happy path vs edge/negative cases.
-
 ---

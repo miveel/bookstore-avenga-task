@@ -16,7 +16,10 @@ repositories {
 
 dependencies {
     // JUnit 5 for unit testing
-    testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.0")
+
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.0")
+
 
     // RestAssured for API testing
     testImplementation("io.rest-assured:rest-assured:5.3.0")
@@ -29,15 +32,18 @@ dependencies {
     // Allure JUnit5 adapter
     testImplementation("io.qameta.allure:allure-junit5:2.22.0")
 
-    // Optional: SLF4J logging for RestAssured
+    // Optional logging
     testImplementation("org.slf4j:slf4j-simple:2.0.9")
 }
 
 tasks.test {
     useJUnitPlatform()
+
+    // Ensure tests write JSON results to correct folder
     systemProperty("allure.results.directory", "$buildDir/allure-results")
 
-    // Log summary after test execution
+    testLogging.showStandardStreams = true
+
     doLast {
         println("====================================")
         println("✅ Test execution finished!")
@@ -48,7 +54,7 @@ tasks.test {
     }
 }
 
-// Task to log after generating Allure HTML report
+// Optional task logging for after report
 tasks.register("logAllureReport") {
     doLast {
         println("====================================")
@@ -59,12 +65,6 @@ tasks.register("logAllureReport") {
     }
 }
 
-// Ensure logAllureReport runs after allureReport
 tasks.named("allureReport") {
     finalizedBy("logAllureReport")
-}
-
-// Allure plugin configuration
-allure {
-    version.set("2.22.0")
 }

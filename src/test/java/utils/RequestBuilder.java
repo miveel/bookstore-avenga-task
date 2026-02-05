@@ -1,5 +1,6 @@
 package utils;
 
+import models.Author;
 import models.Book;
 import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
@@ -46,5 +47,15 @@ public class RequestBuilder {
     public static RequestSpecification bookRequest(Book book) {
         return baseRequestWithAccept(DEFAULT_ACCEPT)
                 .body(book);
+    }
+
+    /**
+     * Returns a request specification with an Author object as the request body.
+     *
+     * @param author Author object to be serialized to JSON
+     */
+    public static RequestSpecification authorRequest(Author author) {
+        return baseRequestWithAccept(DEFAULT_ACCEPT)
+                .body(author);
     }
 }
