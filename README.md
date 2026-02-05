@@ -83,7 +83,7 @@ docker run --rm -p 5050:5050 \
   frankescobar/allure-docker-service
 
 ```
-### Open report
+### Open report in browser
 ```bash 
 http://localhost:5050/allure-docker-service/latest-report
 ```
@@ -91,8 +91,6 @@ http://localhost:5050/allure-docker-service/latest-report
 ## Environment Variables
 
 - `BASE_URL` – base URL for the API (default: https://fakerestapi.azurewebsites.net)
-- `ALLURE_RESULTS_DIR` – optional custom directory for Allure results (default: build/allure-results)
-
 
 ## CI/CD with GitHub Actions
 
@@ -108,5 +106,4 @@ http://localhost:5050/allure-docker-service/latest-report
 5. **Run tests and generate Allure report** – `./gradlew test allureReport`.
 6. **Upload Allure report as artifact** – For download or viewing in GitHub Actions.
 
-> Note: The Docker container can also be used in CI/CD pipelines to run tests and serve reports consistently.
----
+> Note: CI/CD Integration: The project includes a GitHub Actions workflow that automatically builds the project, runs tests, and generates an Allure report on every push or pull request. Allure report artifacts are uploaded and can be reviewed in the Actions panel. 
