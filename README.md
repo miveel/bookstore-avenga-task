@@ -30,8 +30,8 @@ bookstore-api-automation/
 
 ### 1. Clone the repository
 ```bash
-git clone <repo-url>
-cd bookstore-api-automation  # local folder name, repo on GitHub is named bookstore-avenga-task
+git clone https://github.com/miveel/bookstore-avenga-task.git
+cd bookstore-api-automation
 ```
 ### 2. Set base URL (optional, default is FakeRestAPI)
 ```bash
