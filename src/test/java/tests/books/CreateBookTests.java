@@ -71,4 +71,18 @@ public class CreateBookTests extends BaseApiTest {
         // Expected 400 Bad Request → true negative case
         ResponseValidator.assertStatusCode(response, 400);
     }
+    @Test
+    public void shouldFaiEmptyDate() {
+        Book book = new Book();
+        book.setTitle("Invalid Date Book");
+        book.setPageCount(10);
+        book.setPublishDate(""); // Invalid ISO format
+
+        Response response = RequestBuilder.bookRequest(book)
+                .when()
+                .post("/Books");
+
+        // Expected 400 Bad Request → true negative case
+        ResponseValidator.assertStatusCode(response, 400);
+    }
 }
